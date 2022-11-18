@@ -46,8 +46,7 @@ describe('top-secret routes', () => {
       iat: expect.any(Number),
     });
   });
-
-  it('/DELETE should return a 401 error when signed out', async () => {
+  it('/DELETE should return a 401 error when signed out and trying to view /users', async () => {
     const res = await request(app).get('/api/v1/users');
 
     expect(res.body).toEqual({
@@ -55,6 +54,23 @@ describe('top-secret routes', () => {
       status: 401,
     });
   });
+  it('/GET api/v1/secrets should return the list of secrets if authenticated', async () => {
+    const [agent] = await registerAndLogin();
+    const res = await agent.get('/api/v1/secrets');
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBe(3);
+    expect(res.body[0]).toEqual({
+      id: expect.any(String),
+      title: expect.any(String),
+      description: expect.any(String),
+      createdAt: expect.any(String),
+    });
+  });
+  it('GET api/v1/secrets should return a 401 if not authenticated', async () => {
+    const res = await request(app).get('/api/v1/secrets');
+    expect(res.status).toEqual(401);
+  });
+
   afterAll(() => {
     pool.end();
   });
