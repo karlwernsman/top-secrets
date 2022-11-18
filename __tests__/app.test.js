@@ -47,6 +47,14 @@ describe('top-secret routes', () => {
     });
   });
 
+  it('/DELETE should return a 401 error when signed out', async () => {
+    const res = await request(app).get('/api/v1/users');
+
+    expect(res.body).toEqual({
+      message: 'You must be signed in...',
+      status: 401,
+    });
+  });
   afterAll(() => {
     pool.end();
   });
